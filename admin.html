@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>이미지 업로드 · 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --frost:#EEF2F7; --paper:#FFFFFF; --ink:#1A2236; --slate:#586178; --line:#D3DAE7;
+  --accent:#4636C8; --accent-deep:#3628A8; --accent-soft:#E6E3FA;
+  --ok:#17795A; --warn:#8A5A00; --err:#B3261E; --cut:14px;
+  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--frost);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button,input,select,a,summary{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:900px;margin:0 auto;padding:40px 24px 120px}
+h1{margin:0;font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:-.02em;word-break:keep-all}
+.lead{margin:6px 0 0;color:var(--slate);word-break:keep-all}
+.back{display:inline-block;margin-bottom:14px;color:var(--accent);text-decoration:none}
+.back:hover{text-decoration:underline}
+
+section{margin-top:32px}
+section>h2{margin:0 0 10px;font-size:1.15rem}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label,.field .lab{font-size:.9rem;font-weight:500}
+.field .hint{font-size:.82rem;color:var(--slate)}
+input[type=text],input[type=password],select{
+  height:42px;padding:0 12px;border:1px solid var(--line);border-radius:4px;background:#fff;width:100%;min-width:0
+}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.check{display:flex;gap:8px;align-items:center;font-size:.92rem}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;
+  border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:#fff;font-weight:500;cursor:pointer;text-decoration:none
+}
+.btn:hover{background:var(--accent-deep);border-color:var(--accent-deep)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover:not(:disabled){background:var(--accent-soft)}
+.btn.small{height:34px;padding:0 12px;font-size:.9rem}
+
+.status{margin-top:12px;font-size:.92rem;min-height:1.4em}
+.status.ok{color:var(--ok)} .status.err{color:var(--err)} .status.warn{color:var(--warn)}
+
+details.safety{margin-top:14px;font-size:.9rem;color:var(--slate)}
+details.safety summary{cursor:pointer;color:var(--ink);font-weight:500}
+details.safety ul{margin:8px 0 0;padding-left:1.2em}
+
+/* dropzone */
+.drop{
+  display:grid;place-items:center;gap:6px;text-align:center;padding:36px 20px;cursor:pointer;
+  border:2px dashed var(--line);border-radius:6px;background:var(--paper);color:var(--slate)
+}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.drop strong{color:var(--ink);font-size:1.05rem}
+.drop input{display:none}
+
+/* entries */
+.entries{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.entry{display:grid;grid-template-columns:180px 1fr;gap:18px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px;position:relative}
+.entry.invalid{border-color:var(--err)}
+.pv{
+  aspect-ratio:1;align-self:start;display:grid;place-items:center;
+  background-color:#fff;background-image:conic-gradient(#E9EDF4 25%,transparent 0 50%,#E9EDF4 0 75%,transparent 0);background-size:16px 16px;
+  clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,var(--cut) 100%,0 calc(100% - var(--cut)))
+}
+.pv img{max-width:100%;max-height:100%;object-fit:contain;padding:8px;display:block}
+.pvinfo{margin-top:6px;font-size:.8rem;color:var(--slate)}
+.pvinfo.warn{color:var(--warn)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;min-width:0}
+.fields .full{grid-column:1/-1}
+.namewrap{display:flex;align-items:center;gap:6px}
+.namewrap .ext{color:var(--slate);white-space:nowrap}
+.sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.sug button{height:28px;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--slate);cursor:pointer;font-size:.82rem}
+.sug button:hover{border-color:var(--accent);color:var(--ink)}
+.sug button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.rm{position:absolute;top:8px;right:8px;width:34px;height:34px;border:1px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;display:grid;place-items:center}
+.rm:hover{border-color:var(--err);color:var(--err)}
+.err-msg{color:var(--err);font-size:.85rem;min-height:1em}
+
+/* publish */
+.publish{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:18px}
+.log{list-style:none;margin:14px 0 0;padding:0;font-size:.92rem;color:var(--slate)}
+.log li{padding:2px 0}
+.log li.done{color:var(--ok)}
+.log li.fail{color:var(--err)}
+.result{margin-top:14px;padding:14px 16px;border-radius:6px;background:#E8F5EF;border:1px solid #B9DFCE;color:#0F5A42}
+.result[hidden]{display:none}
+.result a{color:inherit;font-weight:500}
+
+@media (max-width:640px){
+  .grid2,.fields{grid-template-columns:1fr}
+  .entry{grid-template-columns:1fr}
+  .pv{max-width:180px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 갤러리로 돌아가기</a>
+  <h1>이미지 업로드</h1>
+  <p class="lead">이미지를 첨부하고 이름·태그를 적으면 GitHub 저장소에 자동으로 커밋돼요. 커밋되면 연결된 호스팅이 사이트를 다시 배포합니다.</p>
+
+  <section>
+    <h2>1. GitHub 연결</h2>
+    <div class="panel">
+      <div class="grid2">
+        <div class="field"><label for="owner">저장소 소유자</label><input id="owner" type="text" autocomplete="off" placeholder="내-깃허브-아이디"></div>
+        <div class="field"><label for="repo">저장소 이름</label><input id="repo" type="text" autocomplete="off" placeholder="cubic-gallery"></div>
+        <div class="field"><label for="branch">브랜치</label><input id="branch" type="text" autocomplete="off" value="main"></div>
+        <div class="field"><label for="base">사이트 폴더</label><input id="base" type="text" autocomplete="off" placeholder="비워두면 저장소 맨 위"><span class="hint">index.html이 저장소 안 하위 폴더에 있을 때만 적어요.</span></div>
+        <div class="field full">
+          <label for="token">액세스 토큰 (Fine-grained PAT)</label>
+          <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+          <span class="hint">이 저장소 하나에만 <b>Contents: Read and write</b> 권한을 준 토큰을 쓰세요.</span>
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn ghost" id="connect" type="button">연결 확인</button>
+        <label class="check"><input type="checkbox" id="remember"> 이 브라우저에 토큰 기억하기</label>
+      </div>
+      <div class="status" id="connStatus" role="status"></div>
+      <details class="safety">
+        <summary>토큰을 안전하게 쓰는 법</summary>
+        <ul>
+          <li>토큰은 이 페이지에서 <b>api.github.com</b> 으로만 전송돼요. 다른 곳으로 보내지 않아요.</li>
+          <li>이 페이지는 사이트와 함께 공개되지만, 토큰이 없는 사람은 아무것도 올릴 수 없어요.</li>
+          <li>공용 PC에서는 “기억하기”를 끄세요. 토큰에는 만료일을 꼭 지정하고, 유출이 의심되면 GitHub에서 바로 폐기하세요.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 이미지 추가</h2>
+    <label class="drop" id="drop" for="picker">
+      <strong>이미지를 끌어다 놓거나 눌러서 선택</strong>
+      <span>PNG · JPG · WebP · GIF, 여러 장 가능</span>
+      <input id="picker" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
+    </label>
+    <ul class="entries" id="entries"></ul>
+    <datalist id="dlCat"></datalist>
+    <datalist id="dlColor"></datalist>
+  </section>
+
+  <section>
+    <h2>3. 사이트에 반영</h2>
+    <div class="panel">
+      <div class="row">
+        <label class="check"><input type="checkbox" id="front" checked> 새 이미지를 목록 맨 앞에 표시</label>
+      </div>
+      <div class="publish">
+        <button class="btn" id="publish" type="button" disabled>반영하기</button>
+        <span class="status" id="pubStatus" role="status" style="margin:0"></span>
+      </div>
+      <ol class="log" id="log" aria-live="polite"></ol>
+      <div class="result" id="result" hidden></div>
+    </div>
+  </section>
+</div>
+
+<script src="gallery-data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STORE = "cubicAdmin.v1";
+  var THUMB_MAX = 420;
+  var ALLOWED = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif" };
+
+  var $ = function (s) { return document.querySelector(s); };
+  var f = { owner: $("#owner"), repo: $("#repo"), branch: $("#branch"), base: $("#base"), token: $("#token"), remember: $("#remember") };
+  var connStatus = $("#connStatus"), pubStatus = $("#pubStatus"), logEl = $("#log"), resultEl = $("#result");
+  var entriesEl = $("#entries"), publishBtn = $("#publish");
+
+  var known = { files: new Set(), stems: new Set(), categories: [], colors: [], tags: [] };
+  var entries = [];
+  var seq = 0;
+  var busy = false;
+
+  /* ---------------- 저장된 설정 ---------------- */
+  (function loadSaved() {
+    try {
+      var s = JSON.parse(localStorage.getItem(STORE) || "{}");
+      ["owner", "repo", "branch", "base"].forEach(function (k) { if (s[k] != null) f[k].value = s[k]; });
+      if (s.token) { f.token.value = s.token; f.remember.checked = true; }
+    } catch (e) { /* 저장소 사용 불가 시 무시 */ }
+  })();
+
+  function saveSettings() {
+    try {
+      var s = { owner: f.owner.value.trim(), repo: f.repo.value.trim(), branch: f.branch.value.trim(), base: f.base.value.trim() };
+      if (f.remember.checked) s.token = f.token.value.trim();
+      localStorage.setItem(STORE, JSON.stringify(s));
+    } catch (e) { /* ignore */ }
+  }
+
+  function cfg() {
+    return {
+      owner: f.owner.value.trim(),
+      repo: f.repo.value.trim(),
+      branch: (f.branch.value.trim() || "main"),
+      base: f.base.value.trim().replace(/^\/+|\/+$/g, ""),
+      token: f.token.value.trim()
+    };
+  }
+  function repoPath(p) { var b = cfg().base; return b ? b + "/" + p : p; }
+
+  /* ---------------- GitHub API ---------------- */
+  async function gh(path, opts) {
+    opts = opts || {};
+    var c = cfg();
+    var headers = {
+      "Accept": opts.accept || "application/vnd.github+json",
+      "Authorization": "Bearer " + c.token,
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+    if (opts.body) headers["Content-Type"] = "application/json";
+    var res = await fetch("https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) + path, {
+      method: opts.method || "GET",
+      headers: headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    if (!res.ok) {
+      var msg = "";
+      try { msg = (await res.clone().json()).message || ""; } catch (e) { /* not json */ }
+      var err = new Error(msg || ("HTTP " + res.status));
+      err.status = res.status;
+      throw err;
+    }
+    return opts.text ? res.text() : res.json();
+  }
+
+  function friendly(err) {
+    if (err && err.status === 401) return "토큰이 올바르지 않거나 만료됐어요.";
+    if (err && err.status === 403) return "이 토큰에 쓰기 권한이 없어요. 저장소 하나에 Contents: Read and write 권한이 필요해요.";
+    if (err && err.status === 404) return "저장소나 브랜치를 찾지 못했어요. 소유자·저장소·브랜치 이름을 확인하고, 비공개 저장소라면 토큰에 그 저장소 접근 권한이 있는지 확인하세요.";
+    if (err && err.status === 422) return "GitHub가 요청을 거부했어요: " + err.message;
+    if (err instanceof TypeError) return "GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.";
+    return (err && err.message) || "알 수 없는 오류가 발생했어요.";
+  }
+
+  function encPath(p) { return p.split("/").map(encodeURIComponent).join("/"); }
+
+  async function loadRemoteData() {
+    var c = cfg();
+    var text = await gh("/contents/" + encPath(repoPath("gallery-data.js")) + "?ref=" + encodeURIComponent(c.branch),
+      { accept: "application/vnd.github.raw+json", text: true });
+    var m = text.match(/window\.GALLERY\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
+    if (!m) throw new Error("gallery-data.js 형식을 읽지 못했어요.");
+    var data = JSON.parse(m[1]);
+    data.site = data.site || {};
+    data.images = data.images || [];
+    return data;
+  }
+
+  function serialize(data) { return "window.GALLERY = " + JSON.stringify(data, null, 2) + ";\n"; }
+
+  /* ---------------- 제안(자동완성) ---------------- */
+  function stemOf(name) { return name.replace(/\.[^.]+$/, ""); }
+
+  function absorb(data) {
+    var files = new Set(), stems = new Set(), cats = [], colors = [], tagCount = {};
+    (data.images || []).forEach(function (i) {
+      files.add(i.file); stems.add(stemOf(i.file));
+      if (i.category && cats.indexOf(i.category) < 0) cats.push(i.category);
+      if (i.color && colors.indexOf(i.color) < 0) colors.push(i.color);
+      (i.tags || []).forEach(function (t) { tagCount[t] = (tagCount[t] || 0) + 1; });
+    });
+    known.files = files; known.stems = stems; known.categories = cats; known.colors = colors;
+    known.tags = Object.keys(tagCount).sort(function (a, b) { return tagCount[b] - tagCount[a] || a.localeCompare(b, "ko"); });
+    fillList($("#dlCat"), cats); fillList($("#dlColor"), colors);
+    renderEntries();
+  }
+  function fillList(dl, values) {
+    dl.replaceChildren.apply(dl, values.map(function (v) { var o = document.createElement("option"); o.value = v; return o; }));
+  }
+  absorb(window.GALLERY || { images: [] });   // 같은 사이트의 목록으로 우선 채움 (연결 후 저장소 기준으로 갱신)
+
+  /* ---------------- 연결 확인 ---------------- */
+  function setStatus(el, cls, text) { el.className = "status " + cls; el.textContent = text; }
+
+  $("#connect").addEventListener("click", async function () {
+    var c = cfg();
+    if (!c.owner || !c.repo || !c.token) { setStatus(connStatus, "err", "소유자, 저장소, 토큰을 모두 입력해 주세요."); return; }
+    saveSettings();
+    setStatus(connStatus, "", "확인하는 중…");
+    try {
+      var repo = await gh("");
+      await gh("/git/ref/heads/" + encPath(c.branch));
+      var data = await loadRemoteData();
+      absorb(data);
+      var canPush = !(repo.permissions && repo.permissions.push === false);
+      if (canPush) setStatus(connStatus, "ok", "연결됐어요. 현재 이미지 " + data.images.length + "개가 등록돼 있어요.");
+      else setStatus(connStatus, "warn", "저장소는 찾았지만 쓰기 권한이 없어 보여요. 토큰 권한을 확인하세요.");
+    } catch (e) {
+      setStatus(connStatus, "err", friendly(e));
+    }
+    updatePublish();
+  });
+  ["owner", "repo", "branch", "base", "token"].forEach(function (k) { f[k].addEventListener("input", updatePublish); });
+  f.remember.addEventListener("change", function () {
+    if (!f.remember.checked) { try { var s = JSON.parse(localStorage.getItem(STORE) || "{}"); delete s.token; localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} }
+    else saveSettings();
+  });
+
+  /* ---------------- 파일 추가 ---------------- */
+  function slugify(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+  function takenStem(stem, ignoreId) {
+    if (known.stems.has(stem)) return true;
+    return entries.some(function (e) { return e.id !== ignoreId && e.stem === stem; });
+  }
+  function uniqueStem(base) {
+    var stem = base, n = 2;
+    while (takenStem(stem)) { stem = base + "-" + (n < 10 ? "0" + n : n); n++; }
+    return stem;
+  }
+
+  function loadImage(url) {
+    return new Promise(function (res, rej) {
+      var i = new Image();
+      i.onload = function () { res(i); };
+      i.onerror = function () { rej(new Error("이미지를 읽지 못했어요.")); };
+      i.src = url;
+    });
+  }
+  function toBlob(canvas, type, q) { return new Promise(function (r) { canvas.toBlob(r, type, q); }); }
+
+  async function makeThumb(img) {
+    var s = Math.min(1, THUMB_MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    var w = Math.max(1, Math.round(img.naturalWidth * s)), h = Math.max(1, Math.round(img.naturalHeight * s));
+    var c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var ctx = c.getContext("2d");
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(img, 0, 0, w, h);
+    var blob = await toBlob(c, "image/webp", 0.88), ext = "webp";
+    if (!blob || blob.type !== "image/webp") { blob = await toBlob(c, "image/png"); ext = "png"; }   // 일부 브라우저 대비
+    return { blob: blob, ext: ext };
+  }
+
+  async function addFiles(fileList) {
+    var skipped = [];
+    for (var i = 0; i < fileList.length; i++) {
+      var file = fileList[i];
+      var ext = ALLOWED[file.type];
+      if (!ext) { skipped.push(file.name); continue; }
+      try {
+        var url = URL.createObjectURL(file);
+        var img = await loadImage(url);
+        var thumb = await makeThumb(img);
+        var base = slugify(stemOf(file.name)) || "image";
+        var id = ++seq;
+        entries.push({
+          id: id, blob: file, ext: ext, url: url, w: img.naturalWidth, h: img.naturalHeight, thumb: thumb,
+          stem: uniqueStem(base), title: "", category: "", color: "", tags: []
+        });
+      } catch (e) { skipped.push(file.name); }
+    }
+    renderEntries();
+    if (skipped.length) setStatus(pubStatus, "warn", "읽지 못한 파일: " + skipped.join(", "));
+  }
+
+  var drop = $("#drop"), picker = $("#picker");
+  picker.addEventListener("change", function () { var picked = Array.from(picker.files); picker.value = ""; addFiles(picked); });
+  ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) addFiles(Array.from(e.dataTransfer.files)); });
+
+  /* ---------------- 입력 카드 ---------------- */
+  function parseTags(str) {
+    var parts = str.indexOf(",") >= 0 ? str.split(",") : str.split(/\s+/);
+    var out = [];
+    parts.forEach(function (p) {
+      p = p.trim().replace(/^#/, "");
+      if (p && out.indexOf(p) < 0) out.push(p);
+    });
+    return out;
+  }
+  function validStem(s) { return /^[a-z0-9][a-z0-9._-]*$/.test(s); }
+  function entryError(e) {
+    if (!e.title.trim()) return "제목을 입력해 주세요.";
+    if (!validStem(e.stem)) return "파일명은 영문 소문자·숫자·하이픈(-)만 쓸 수 있어요.";
+    if (takenStem(e.stem, e.id)) return "이미 같은 파일명이 있어요. 다른 이름으로 바꿔 주세요.";
+    return "";
+  }
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === "class") n.className = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { n.appendChild(c); });
+    return n;
+  }
+  function field(label, input, full, extra) {
+    var id = "fld" + Math.random().toString(36).slice(2, 8);
+    input.id = id;
+    var wrap = el("div", { class: "field" + (full ? " full" : "") }, [el("label", { for: id, text: label }), input]);
+    if (extra) wrap.appendChild(extra);
+    return wrap;
+  }
+
+  function renderEntries() {
+    entriesEl.replaceChildren();
+    entries.forEach(function (e) { entriesEl.appendChild(buildEntry(e)); });
+    updatePublish();
+  }
+
+  function buildEntry(e) {
+    var li = el("li", { class: "entry" });
+
+    var img = el("img", { src: e.url, alt: "" });
+    var pv = el("div", { class: "pv" }, [img]);
+    var small = Math.max(e.w, e.h) < 600;
+    var info = el("div", { class: "pvinfo" + (small ? " warn" : ""),
+      text: e.w + " × " + e.h + "px" + (small ? " · 작은 이미지예요. 먼저 업스케일하면 더 선명해요." : "") });
+    var left = el("div", {}, [pv, info]);
+
+    var title = el("input", { type: "text", placeholder: "예: 오로라 하트 큐빅", autocomplete: "off" });
+    title.value = e.title;
+    var cat = el("input", { type: "text", list: "dlCat", placeholder: "예: 큐빅", autocomplete: "off" });
+    cat.value = e.category;
+    var color = el("input", { type: "text", list: "dlColor", placeholder: "예: 오로라", autocomplete: "off" });
+    color.value = e.color;
+    var tags = el("input", { type: "text", placeholder: "쉼표나 띄어쓰기로 구분: 하트, 오로라", autocomplete: "off" });
+    tags.value = e.tags.join(", ");
+    var stem = el("input", { type: "text", autocomplete: "off", spellcheck: "false" });
+    stem.value = e.stem;
+    var errMsg = el("div", { class: "err-msg", "aria-live": "polite" });
+
+    function refreshErr(show) {
+      var msg = entryError(e);
+      li.classList.toggle("invalid", !!msg && show);
+      errMsg.textContent = show ? msg : "";
+      updatePublish();
+    }
+
+    title.addEventListener("input", function () { e.title = title.value; refreshErr(false); });
+    title.addEventListener("blur", function () { refreshErr(true); });
+    cat.addEventListener("input", function () { e.category = cat.value.trim(); });
+    color.addEventListener("input", function () { e.color = color.value.trim(); });
+    stem.addEventListener("input", function () { e.stem = stem.value.trim().toLowerCase(); refreshErr(true); });
+
+    var sugWrap = el("div", { class: "sug" });
+    function renderSug() {
+      sugWrap.replaceChildren();
+      known.tags.slice(0, 12).forEach(function (t) {
+        var on = e.tags.indexOf(t) >= 0;
+        var b = el("button", { type: "button", "aria-pressed": String(on), text: t });
+        b.addEventListener("click", function () {
+          var i = e.tags.indexOf(t);
+          if (i >= 0) e.tags.splice(i, 1); else e.tags.push(t);
+          tags.value = e.tags.join(", ");
+          renderSug();
+        });
+        sugWrap.appendChild(b);
+      });
+    }
+    renderSug();
+    tags.addEventListener("input", function () { e.tags = parseTags(tags.value); renderSug(); });
+
+    var extSpan = el("span", { class: "ext", text: "." + e.ext });
+    var nameWrap = el("div", { class: "namewrap" }, [stem, extSpan]);
+    var nameField = el("div", { class: "field full" }, [el("span", { class: "lab", text: "파일명 (영문)" }), nameWrap,
+      el("span", { class: "hint", text: "저장될 이름이에요. 한글 제목과 별개로 영문·숫자·하이픈만 쓰세요." })]);
+
+    var fields = el("div", { class: "fields" }, [
+      field("제목 (사이트에 보이는 이름)", title, true),
+      field("종류", cat),
+      field("색상", color),
+      (function () { var w = field("태그", tags, true, sugWrap); return w; })(),
+      nameField,
+      el("div", { class: "full" }, [errMsg])
+    ]);
+
+    var rm = el("button", { class: "rm", type: "button", "aria-label": "이 이미지 빼기" });
+    rm.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    rm.addEventListener("click", function () {
+      URL.revokeObjectURL(e.url);
+      entries = entries.filter(function (x) { return x !== e; });
+      renderEntries();
+    });
+
+    li.appendChild(left); li.appendChild(fields); li.appendChild(rm);
+    return li;
+  }
+
+  function updatePublish() {
+    var c = cfg();
+    var hasConn = c.owner && c.repo && c.token;
+    publishBtn.disabled = !(hasConn && entries.length && !busy);
+    if (busy) return;
+    if (entries.length && !hasConn) {
+      setStatus(pubStatus, "warn", "위에서 GitHub 연결 정보를 먼저 입력해 주세요.");
+    } else if (pubStatus.className.indexOf("warn") >= 0 ||
+               (pubStatus.dataset.kind === "validation" && entries.every(function (e) { return !entryError(e); }))) {
+      pubStatus.textContent = ""; pubStatus.className = "status"; delete pubStatus.dataset.kind;
+    }
+  }
+
+  /* ---------------- 반영 ---------------- */
+  function log(text, cls) {
+    var li = document.createElement("li");
+    li.textContent = text;
+    if (cls) li.className = cls;
+    logEl.appendChild(li);
+    return li;
+  }
+  function blobToBase64(blob) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onload = function () { res(String(r.result).split(",")[1]); };
+      r.onerror = function () { rej(new Error("파일을 읽지 못했어요.")); };
+      r.readAsDataURL(blob);
+    });
+  }
+  async function createBlob(base64) {
+    var r = await gh("/git/blobs", { method: "POST", body: { content: base64, encoding: "base64" } });
+    return r.sha;
+  }
+
+  publishBtn.addEventListener("click", async function () {
+    // 입력 검사
+    var bad = null;
+    entries.forEach(function (e) { if (!bad && entryError(e)) bad = e; });
+    if (bad) {
+      renderEntriesWithErrors();
+      setStatus(pubStatus, "err", "빨간 테두리 항목의 입력을 확인해 주세요.");
+      pubStatus.dataset.kind = "validation";
+      return;
+    }
+    saveSettings();
+    busy = true; publishBtn.disabled = true;
+    logEl.replaceChildren(); resultEl.hidden = true;
+    setStatus(pubStatus, "", "반영하는 중… 창을 닫지 마세요.");
+
+    var c = cfg();
+    var batch = entries.slice();
+    var items = batch.map(function (e) {
+      return {
+        file: e.stem + "." + e.ext, title: e.title.trim(), category: e.category, color: e.color,
+        tags: e.tags, thumb: e.stem + "." + e.thumb.ext
+      };
+    });
+    var currentLog = null;
+    try {
+      // 1) 이미지 + 썸네일 업로드(blob)
+      var treeEntries = [];
+      for (var i = 0; i < batch.length; i++) {
+        currentLog = log("이미지 업로드 " + (i + 1) + "/" + batch.length + " · " + items[i].file);
+        var imgSha = await createBlob(await blobToBase64(batch[i].blob));
+        var thSha = await createBlob(await blobToBase64(batch[i].thumb.blob));
+        treeEntries.push({ path: repoPath("images/" + items[i].file), mode: "100644", type: "blob", sha: imgSha });
+        treeEntries.push({ path: repoPath("thumbs/" + items[i].thumb), mode: "100644", type: "blob", sha: thSha });
+        currentLog.className = "done";
+      }
+
+      // 2) 목록 갱신 + 커밋 (다른 커밋과 겹치면 최대 3번 다시 시도)
+      var commit = null, merged = null;
+      for (var attempt = 0; attempt < 3; attempt++) {
+        currentLog = log(attempt ? "충돌이 있어 다시 시도하는 중…" : "gallery-data.js 갱신 중…");
+        var head = await gh("/git/ref/heads/" + encPath(c.branch));
+        var headCommit = await gh("/git/commits/" + head.object.sha);
+        var remote = await loadRemoteData();
+        var have = new Set(remote.images.map(function (x) { return x.file; }));
+        items.forEach(function (it) {
+          if (have.has(it.file)) throw new Error("저장소에 이미 같은 파일명이 있어요: " + it.file);
+        });
+        merged = remote;
+        merged.images = $("#front").checked ? items.concat(remote.images) : remote.images.concat(items);
+        var dataBlob = await gh("/git/blobs", { method: "POST", body: { content: serialize(merged), encoding: "utf-8" } });
+        var tree = await gh("/git/trees", { method: "POST", body: {
+          base_tree: headCommit.tree.sha,
+          tree: treeEntries.concat([{ path: repoPath("gallery-data.js"), mode: "100644", type: "blob", sha: dataBlob.sha }])
+        } });
+        commit = await gh("/git/commits", { method: "POST", body: {
+          message: "이미지 " + items.length + "장 추가: " + items.map(function (x) { return x.title; }).slice(0, 3).join(", ") + (items.length > 3 ? " 외" : ""),
+          tree: tree.sha, parents: [head.object.sha]
+        } });
+        try {
+          await gh("/git/refs/heads/" + encPath(c.branch), { method: "PATCH", body: { sha: commit.sha, force: false } });
+          currentLog.className = "done";
+          break;
+        } catch (e) {
+          if (e.status === 422 && attempt < 2) { currentLog.className = "fail"; continue; }
+          throw e;
+        }
+      }
+
+      // 3) 완료
+      log("커밋 완료", "done");
+      absorb(merged);
+      entries.forEach(function (e) { URL.revokeObjectURL(e.url); });
+      entries = [];
+      renderEntries();
+      setStatus(pubStatus, "ok", "반영 요청 완료!");
+      resultEl.hidden = false;
+      resultEl.textContent = "";
+      var msg = document.createElement("span");
+      msg.textContent = "이미지 " + items.length + "장을 저장소에 올렸어요. 호스팅이 다시 배포하면 사이트에 나타나요 (GitHub Pages는 보통 1~2분). ";
+      resultEl.appendChild(msg);
+      if (commit && commit.html_url) {
+        var a = document.createElement("a");
+        a.href = commit.html_url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "커밋 보기";
+        resultEl.appendChild(a);
+      }
+    } catch (e) {
+      if (currentLog) currentLog.className = "fail";
+      log("실패: " + friendly(e), "fail");
+      setStatus(pubStatus, "err", "반영하지 못했어요. 아래 내용을 확인해 주세요.");
+    } finally {
+      busy = false;
+      updatePublish();
+    }
+  });
+
+  function renderEntriesWithErrors() {
+    renderEntries();
+    var items = entriesEl.querySelectorAll(".entry");
+    entries.forEach(function (e, i) {
+      var msg = entryError(e);
+      if (msg) {
+        items[i].classList.add("invalid");
+        items[i].querySelector(".err-msg").textContent = msg;
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
