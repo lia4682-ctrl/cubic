@@ -6,6 +6,60 @@ window.GALLERY = {
   },
   "images": [
     {
+      "file": "lolerskate.png",
+      "title": "아이보리 롤러스케이트 참",
+      "category": "참",
+      "color": "아이보리",
+      "tags": [
+        "미니"
+      ],
+      "thumb": "lolerskate.webp"
+    },
+    {
+      "file": "candy.png",
+      "title": "오로라 사탕 레진",
+      "category": "레진",
+      "color": "멀티",
+      "tags": [
+        "캔디",
+        "파스텔"
+      ],
+      "thumb": "candy.webp"
+    },
+    {
+      "file": "stars_03.png",
+      "title": "오로라 별 진주",
+      "category": "진주",
+      "color": "오로라",
+      "tags": [
+        "진주",
+        "별"
+      ],
+      "thumb": "stars_03.webp"
+    },
+    {
+      "file": "image-crown.png",
+      "title": "펄 왕관 스티커",
+      "category": "레진",
+      "color": "퍼플",
+      "tags": [
+        "파스텔",
+        "펄"
+      ],
+      "thumb": "image-crown.webp"
+    },
+    {
+      "file": "image-butterfly.png",
+      "title": "오로라 나비 스티커",
+      "category": "진주",
+      "color": "오로라",
+      "tags": [
+        "파스텔",
+        "오로라"
+      ],
+      "thumb": "image-butterfly.webp"
+    },
+    {
       "file": "rhinestone-round-aurora-01.png",
       "title": "오로라 원형 큐빅",
       "category": "큐빅",
