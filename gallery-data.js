@@ -6,48 +6,48 @@ window.GALLERY = {
   },
   "images": [
     {
-      "file": "sample-cube-01.png",
-      "title": "샘플 큐빅 블루",
+      "file": "01.png",
+      "title": "큐빅 01",
       "tags": [
         "샘플",
         "블루"
       ]
     },
     {
-      "file": "sample-cube-02.png",
-      "title": "샘플 큐빅 핑크",
+      "file": "02.png",
+      "title": "큐빅 02",
       "tags": [
         "샘플",
         "핑크"
       ]
     },
     {
-      "file": "sample-cube-03.png",
-      "title": "샘플 큐빅 그린",
+      "file": "03.png",
+      "title": "큐빅 03",
       "tags": [
         "샘플",
         "그린"
       ]
     },
     {
-      "file": "sample-cube-04.png",
-      "title": "샘플 큐빅 골드",
+      "file": "04.png",
+      "title": "큐빅 04",
       "tags": [
         "샘플",
         "골드"
       ]
     },
     {
-      "file": "sample-cube-05.png",
-      "title": "샘플 큐빅 퍼플",
+      "file": "05.png",
+      "title": "큐빅 05",
       "tags": [
         "샘플",
         "퍼플"
       ]
     },
     {
-      "file": "sample-cube-06.png",
-      "title": "샘플 큐빅 그레이",
+      "file": "06.png",
+      "title": "큐빅 06",
       "tags": [
         "샘플",
         "그레이"
