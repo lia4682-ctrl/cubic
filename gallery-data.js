@@ -6,6 +6,83 @@ window.GALLERY = {
   },
   "images": [
     {
+      "file": "g.png",
+      "title": "알파벳 영문 G",
+      "category": "글리터",
+      "color": "핑크",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "g.webp"
+    },
+    {
+      "file": "f.png",
+      "title": "알파벳 영문 F",
+      "category": "글리터",
+      "color": "옐로우",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "f.webp"
+    },
+    {
+      "file": "e.png",
+      "title": "알파벳 영문 E",
+      "category": "글리터",
+      "color": "핑크",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "e.webp"
+    },
+    {
+      "file": "d.png",
+      "title": "알파벳 영문 D",
+      "category": "글리터",
+      "color": "퍼플",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "d.webp"
+    },
+    {
+      "file": "c.png",
+      "title": "알파벳 영문 C",
+      "category": "글리터",
+      "color": "민트",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "c.webp"
+    },
+    {
+      "file": "b.png",
+      "title": "알파벳 영문 B",
+      "category": "글리터",
+      "color": "블루",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "b.webp"
+    },
+    {
+      "file": "a.png",
+      "title": "알파벳 영문 A",
+      "category": "글리터",
+      "color": "핑크",
+      "tags": [
+        "문자",
+        "펄"
+      ],
+      "thumb": "a.webp"
+    },
+    {
       "file": "ohrora_cubic.png",
       "title": "오로라 별 큐빅",
       "category": "큐빅",
