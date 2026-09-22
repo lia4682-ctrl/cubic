@@ -6,6 +6,38 @@ window.GALLERY = {
   },
   "images": [
     {
+      "file": "ohrora_cubic.png",
+      "title": "오로라 별 큐빅",
+      "category": "큐빅",
+      "color": "오로라",
+      "tags": [
+        "별",
+        "오로라"
+      ],
+      "thumb": "ohrora_cubic.webp"
+    },
+    {
+      "file": "white_stars.png",
+      "title": "진주 홀로그램 화이트 별",
+      "category": "진주",
+      "color": "화이트",
+      "tags": [
+        "별",
+        "홀로그램"
+      ],
+      "thumb": "white_stars.webp"
+    },
+    {
+      "file": "bottle.png",
+      "title": "병 형태 별 참",
+      "category": "참",
+      "color": "오로라",
+      "tags": [
+        "별"
+      ],
+      "thumb": "bottle.webp"
+    },
+    {
       "file": "lolerskate.png",
       "title": "아이보리 롤러스케이트 참",
       "category": "참",
